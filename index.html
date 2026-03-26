@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Conhecimento</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0b1d3a, #1d3557, #2a6f97, #e9c46a);
+  min-height: 100vh;
+  color: white;
+}
+
+/* HEADER */
+.header {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 60px;
+  position: relative;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(255,183,77,0.25), transparent 70%);
+  top: -200px;
+  right: -200px;
+  filter: blur(100px);
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3rem;
+}
+
+.header p {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.85);
+  max-width: 600px;
+}
+
+/* INTRO */
+.intro {
+  padding: 20px 60px;
+  max-width: 900px;
+  color: rgba(255,255,255,0.85);
+}
+
+/* MAIN */
+.main {
+  padding: 30px;
+}
+
+/* ITEM */
+.item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.08);
+  transition: 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+}
+
+/* BARRA LATERAL */
+.item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  border-radius: 8px 0 0 8px;
+}
+
+/* CORES PADRÃO */
+.incoterms::before { background: #e9c46a; }
+.sinistro::before { background: #2a9d8f; }
+.risco::before { background: #f4a261; }
+.seguro::before { background: #8ecae6; }
+.documentos::before { background: #90be6d; }
+.prevencao::before { background: #e76f51; }
+
+/* INFO */
+.info {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.icone {
+  font-size: 28px;
+}
+
+.texto h2 {
+  font-size: 1.4rem;
+}
+
+.texto p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.75);
+}
+
+/* BOTÃO */
+.botao {
+  padding: 12px 28px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.18);
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.3s;
+  box-shadow: 0 0 12px rgba(255,255,255,0.25);
+}
+
+.botao:hover {
+  background: rgba(255,255,255,0.35);
+  transform: scale(1.05);
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 25px;
+  color: rgba(255,255,255,0.6);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Central de Conhecimento</h1>
+  <p>Explore conteúdos profissionais sobre transporte, risco e gestão logística.</p>
+</div>
+
+<div class="intro">
+  Escolha um tema abaixo e aprofunde seu conhecimento.
+</div>
+
+<div class="main" id="lista">
+
+<!-- ITENS FIXOS (NÃO REMOVIDOS) -->
+
+</div>
+
+<div class="footer">
+  © 2026 — Nicholas Grassotti Spolavori
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAH0xTUWEeMqsxAIFOMTmDdhAdPHb5AkRY",
+  authDomain: "nick-curso.firebaseapp.com",
+  projectId: "nick-curso",
+  storageBucket: "nick-curso.firebasestorage.app",
+  messagingSenderId: "774707174312",
+  appId: "1:774707174312:web:e9fbf29073ce35bcbe9b9d",
+  measurementId: "G-R87PV5NDGW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* PADRÃO */
+let padrao = [
+  {id:"incoterms", titulo:"Incoterms", descricao:"Regras internacionais", emoji:"📦", cor:"#e9c46a", classe:"incoterms"},
+  {id:"sinistro", titulo:"Regulação de Sinistro", descricao:"Análise de perdas", emoji:"🚚", cor:"#2a9d8f", classe:"sinistro"},
+  {id:"risco", titulo:"Análise de Risco", descricao:"Prevenção", emoji:"⚠️", cor:"#f4a261", classe:"risco"},
+  {id:"seguro", titulo:"Seguro de Transporte", descricao:"Cobertura", emoji:"📑", cor:"#8ecae6", classe:"seguro"},
+  {id:"documentos", titulo:"Documentação", descricao:"Controle", emoji:"🧾", cor:"#90be6d", classe:"documentos"},
+  {id:"prevencao", titulo:"Prevenção", descricao:"Evitar prejuízos", emoji:"🚨", cor:"#e76f51", classe:"prevencao"}
+];
+
+/* CARREGAR */
+db.ref("temas").on("value", snapshot => {
+  let temas = snapshot.val() || [];
+  render([...padrao, ...temas]);
+});
+
+function render(listaTemas){
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  listaTemas.forEach(t => {
+    lista.innerHTML += `
+      <div class="item ${t.classe || ''}" style="border-left:8px solid ${t.cor}">
+        <div class="info">
+          <div class="icone">${t.emoji}</div>
+          <div class="texto">
+            <h2>${t.titulo}</h2>
+            <p>${t.descricao}</p>
+          </div>
+        </div>
+        <button class="botao" onclick="abrirConteudo('${t.id}')">ACESSAR</button>
+      </div>
+    `;
+  });
+}
+
+function abrirConteudo(id){
+  localStorage.setItem("temaSelecionado", id);
+  window.location.href = "conteudo.html";
+}
+</script>
+
+</body>
+</html>
