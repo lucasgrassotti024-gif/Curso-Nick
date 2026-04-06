@@ -174,12 +174,13 @@ let temaAtual = null;
 /* CARREGAR FIREBASE */
 db.ref("temas").on("value", snapshot => {
 
-  const temas = snapshot.val() || [];
+ const dadosFirebase = snapshot.val() || {};
+const temas = Object.values(dadosFirebase);
 
   const temaAdmin = temas.find(t => t.id == temaSelecionado);
   const temaFixo = dados[temaSelecionado];
 
-  temaAtual = temaAdmin;
+  temaAtual = temaAdmin || {};
 
   if (temaAdmin) {
     titulo.innerText = temaAdmin.titulo;
@@ -194,24 +195,24 @@ db.ref("temas").on("value", snapshot => {
 /* ABRIR CONTEÚDO */
 function abrirSecao(tipo){
 
-  if (!temaAtual){
-    alert("Esse tema ainda não possui conteúdo.");
+  if(tipo === "video" && temaAtual.video){
+    window.open(temaAtual.video, "_blank");
     return;
   }
 
-  if (tipo === "apresentacao" && temaAtual.imagem){
+  if(tipo === "apresentacao" && temaAtual.imagem){
     window.open(temaAtual.imagem, "_blank");
+    return;
   }
 
-  if (tipo === "video" && temaAtual.video){
-    window.open(temaAtual.video, "_blank");
-  }
-
-  if (tipo === "ebook" && temaAtual.pdf){
+  if(tipo === "ebook" && temaAtual.pdf){
     window.open(temaAtual.pdf, "_blank");
+    return;
   }
 
+  alert("Conteúdo não encontrado.");
 }
+  
 </script>
 
 </body>
