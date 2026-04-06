@@ -203,7 +203,8 @@ let padrao = [
 
 /* CARREGAR */
 db.ref("temas").on("value", snapshot => {
-  let temas = snapshot.val() || [];
+   let dados = snapshot.val() || {};
+   let temas = Object.values(dados);
   render([...padrao, ...temas]);
 });
 
@@ -211,22 +212,25 @@ function render(listaTemas){
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  listaTemas.forEach(t => {
-    lista.innerHTML += `
-      <div class="item ${t.classe || ''}" style="border-left:8px solid ${t.cor}">
-        <div class="info">
-          <div class="icone">${t.emoji}</div>
-          <div class="texto">
-            <h2>${t.titulo}</h2>
-            <p>${t.descricao}</p>
-          </div>
-        </div>
-        <button class="botao" onclick="abrirConteudo('${t.id}')">ACESSAR</button>
-      </div>
-    `;
-  });
-}
+listaTemas.forEach(t => {
 
+  const cor = t.cor || "#ffffff";
+  const emoji = t.emoji || "📚";
+
+  lista.innerHTML += `
+    <div class="item ${t.classe || ''}" style="border-left:8px solid ${cor}">
+      <div class="info">
+        <div class="icone">${emoji}</div>
+        <div class="texto">
+          <h2>${t.titulo || "Sem título"}</h2>
+          <p>${t.descricao || "Sem descrição"}</p>
+        </div>
+      </div>
+      <button class="botao" onclick="abrirConteudo('${t.id}')">ACESSAR</button>
+    </div>
+  `;
+});
+}
 function abrirConteudo(id){
   localStorage.setItem("temaSelecionado", id);
   window.location.href = "conteudo.html";
