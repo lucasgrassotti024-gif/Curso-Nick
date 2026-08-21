@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Central de Conhecimento</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0b1d3a, #1d3557, #2a6f97, #e9c46a);
+  min-height: 100vh;
+  color: white;
+}
+
+/* HEADER */
+.header {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 60px;
+  position: relative;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(255,183,77,0.25), transparent 70%);
+  top: -200px;
+  right: -200px;
+  filter: blur(100px);
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3rem;
+}
+
+.header p {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.85);
+}
+
+/* INTRO */
+.intro {
+  padding: 20px 60px;
+  max-width: 900px;
+  color: rgba(255,255,255,0.85);
+}
+
+/* MAIN */
+.main {
+  padding: 30px;
+}
+
+/* ITEM */
+.item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.08);
+  transition: 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+}
+
+/* BARRA */
+.item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 100%;
+}
+
+/* INFO */
+.info {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.icone {
+  font-size: 28px;
+}
+
+.texto h2 {
+  font-size: 1.4rem;
+}
+
+.texto p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.75);
+}
+
+/* BOTÕES */
+.botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.botoes button {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* EDITAR */
+.editar {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 0 10px rgba(59,130,246,0.4);
+}
+
+.editar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(59,130,246,0.7);
+}
+
+/* ACESSAR (BOTÃO PRINCIPAL) */
+.acessar {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  box-shadow: 0 0 12px rgba(34,197,94,0.5);
+}
+
+.acessar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(34,197,94,0.8);
+}
+
+/* EXCLUIR (mantém forte) */
+.excluir {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  box-shadow: 0 0 10px rgba(239,68,68,0.4);
+}
+
+.excluir:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(239,68,68,0.7);
+}
+
+/* BOTÃO ADD */
+.add {
+  width: 100%;
+  padding: 30px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.15);
+  text-align: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 25px;
+  color: rgba(255,255,255,0.6);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Admin - Central de Conhecimento</h1>
+  <p>Gerencie todos os temas da plataforma</p>
+</div>
+
+<div class="intro">
+  Você pode criar, editar ou excluir qualquer tema.
+</div>
+
+<div class="main">
+
+  <div class="add" onclick="criarTema()">+ Adicionar novo tema</div>
+
+  <div id="lista"></div>
+
+</div>
+
+<div class="footer">
+  © 2026 — Nicholas Grassotti Spolavori
+</div>
+
+<!-- FIREBASE PRIMEIRO -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+/* FIREBASE PRIMEIRO */
+const firebaseConfig = {
+  apiKey: "AIzaSyAH0xTUWEeMqsxAIFOMTmDdhAdPHb5AkRY",
+  authDomain: "nick-curso.firebaseapp.com",
+  projectId: "nick-curso",
+  storageBucket: "nick-curso.firebasestorage.app",
+  messagingSenderId: "774707174312",
+  appId: "1:774707174312:web:e9fbf29073ce35bcbe9b9d",
+  measurementId: "G-R87PV5NDGW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* TEMAS ORIGINAIS */
+let padrao = [
+  {id:"incoterms", titulo:"Incoterms", descricao:"Regras internacionais de comércio", emoji:"📦", cor:"#e9c46a"},
+  {id:"sinistro", titulo:"Regulação de Sinistro", descricao:"Análise de perdas", emoji:"🚚", cor:"#2a9d8f"},
+  {id:"risco", titulo:"Análise de Risco", descricao:"Prevenção", emoji:"⚠️", cor:"#f4a261"},
+  {id:"seguro", titulo:"Seguro de Transporte", descricao:"Cobertura", emoji:"📑", cor:"#8ecae6"},
+  {id:"documentos", titulo:"Documentação", descricao:"Controle", emoji:"🧾", cor:"#90be6d"},
+  {id:"prevencao", titulo:"Prevenção de Perdas", descricao:"Evitar prejuízos", emoji:"🚨", cor:"#e76f51"}
+];
+
+let temasAdmin = [];
+let carregado = false;
+
+/* JUNTA TODOS */
+function getTemas(){
+  return [...padrao, ...temasAdmin];
+}
+
+/* RENDER */
+function render(){
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  getTemas().forEach(t => {
+    const ePadrao = padrao.some(p => p.id === t.id);
+    lista.innerHTML += `
+      <div class="item" style="border-left:8px solid ${t.cor}">
+        <div class="info">
+          <div class="icone">${t.emoji}</div>
+          <div class="texto">
+            <h2>${t.titulo}</h2>
+            <p>${t.descricao}</p>
+          </div>
+        </div>
+
+        <div class="botoes">
+          <button class="editar" onclick="editar('${t.id}')">Editar</button>
+          ${!ePadrao ? `<button class="excluir" id="btn-${t.id}" onclick="confirmarExcluir('${t.id}')">Excluir</button>` : ''}
+          <button class="acessar" onclick="acessar('${t.id}')">Acessar</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* CRIAR */
+function criarTema(){
+  localStorage.removeItem("editando");
+  window.location.href = "admin_editor.html";
+}
+
+/* EDITAR */
+function editar(id){
+  localStorage.setItem("editando", id);
+  window.location.href = "admin_editor.html";
+}
+
+/* EXCLUIR */
+let confirmando = null;
+let timeoutConfirm = null;
+
+function confirmarExcluir(id) {
+  const btn = document.getElementById("btn-" + id);
+
+  if (confirmando && confirmando !== id) {
+    resetBotao(confirmando);
+    clearTimeout(timeoutConfirm);
+  }
+
+  if (confirmando !== id) {
+    confirmando = id;
+
+    btn.innerText = "Confirmar";
+    btn.style.background = "#b91c1c";
+    btn.style.transform = "scale(1.08)";
+    btn.style.boxShadow = "0 0 12px rgba(255,0,0,0.7)";
+    btn.style.transition = "0.2s";
+
+    timeoutConfirm = setTimeout(() => cancelarConfirmacao(), 4000);
+
+  } else {
+    excluirFinal(id);
+  }
+}
+
+function cancelarConfirmacao() {
+  if (!confirmando) return;
+
+  resetBotao(confirmando);
+  confirmando = null;
+  clearTimeout(timeoutConfirm);
+}
+
+function resetBotao(id) {
+  const btn = document.getElementById("btn-" + id);
+  if (!btn) return;
+
+  btn.innerText = "Excluir";
+  btn.style.background = "#ef4444";
+  btn.style.transform = "scale(1)";
+  btn.style.boxShadow = "none";
+}
+
+function excluirFinal(id) {
+  cancelarConfirmacao();
+
+  temasAdmin = temasAdmin.filter(t => t.id != id);
+  
+  db.ref("temas").set(temasAdmin)
+    .then(() => {
+      console.log("Tema excluído com sucesso");
+    })
+    .catch(error => {
+      console.error("Erro ao excluir tema:", error);
+      alert("Não foi possível excluir o tema.");
+    });
+}
+
+/* ESC cancela */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    cancelarConfirmacao();
+  }
+});
+
+/* clique fora cancela */
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("excluir")) {
+    cancelarConfirmacao();
+  }
+});
+
+/* ACESSAR */
+function acessar(id){
+  localStorage.setItem("temaSelecionado", id);
+  localStorage.setItem("editando", id);
+  window.location.href = "admin_conteudo.html";
+}
+
+/* CARREGAR DO FIREBASE */
+db.ref("temas").on("value", snapshot => {
+  temasAdmin = snapshot.val() || [];
+  carregado = true;
+  render();
+});
+</script>
+
+</body>
+</html>

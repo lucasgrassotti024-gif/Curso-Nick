@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Conteúdo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0b1d3a, #1d3557, #2a6f97, #e9c46a);
+  color: white;
+}
+
+.header {
+  padding: 80px 60px 30px;
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+}
+
+.voltar {
+  display: inline-block;
+  margin-bottom: 30px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.5);
+  color: white;
+  text-decoration: none;
+}
+
+.main {
+  padding: 40px 60px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.form {
+  margin-top: 40px;
+  display: none;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255,255,255,0.6);
+}
+
+@media (max-width: 700px) {
+  .header, .main {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <a href="#" onclick="voltar(event)" class="voltar">← Voltar</a>
+  <h1 id="titulo">Editar Conteúdo</h1>
+</div>
+
+<div class="main">
+
+  <div class="grid">
+
+    <div class="card" onclick="abrirForm('apresentacao')">
+      <div class="icon">📊</div>
+      <h2>Apresentação</h2>
+      <p>Adicionar imagem</p>
+    </div>
+
+    <div class="card" onclick="abrirForm('video')">
+      <div class="icon">🎥</div>
+      <h2>Videoaula</h2>
+      <p>Adicionar vídeo</p>
+    </div>
+
+    <div class="card" onclick="abrirForm('ebook')">
+      <div class="icon">📘</div>
+      <h2>E-book</h2>
+      <p>Adicionar PDF ou texto</p>
+    </div>
+
+  </div>
+
+  <!-- FORM -->
+  <div class="form" id="form">
+
+    <div id="videoSection" style="display:none;">
+      <label style="display:block; margin-bottom:8px;">Link da Videoaula</label>
+      <input type="text" id="linkVideo" placeholder="https://www.youtube.com/...">
+    </div>
+
+    <div id="apresentacaoSection" style="display:none;">
+      <label style="display:block; margin-bottom:8px;">Link da Apresentação</label>
+      <input type="text" id="linkApresentacao" placeholder="https://...">
+    </div>
+
+    <div id="ebookSection" style="display:none;">
+      <label style="display:block; margin-bottom:8px;">Link do E-book (PDF)</label>
+      <input type="text" id="linkEbook" placeholder="https://...">
+    </div>
+
+    <button onclick="salvar()">Salvar Conteúdo</button>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  © 2026 — Nicholas Grassotti Spolavori
+</div>
+
+<!-- FIREBASE PRIMEIRO -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAH0xTUWEeMqsxAIFOMTmDdhAdPHb5AkRY",
+  authDomain: "nick-curso.firebaseapp.com",
+  projectId: "nick-curso",
+  storageBucket: "nick-curso.firebasestorage.app",
+  messagingSenderId: "774707174312",
+  appId: "1:774707174312:web:e9fbf29073ce35bcbe9b9d",
+  measurementId: "G-R87PV5NDGW"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function voltar(e){
+  e.preventDefault();
+  window.location.href = "admin_index.html";
+}
+
+/* TEMAS ORIGINAIS */
+let padrao = [
+  {id:"incoterms", titulo:"Incoterms", descricao:"Regras internacionais de comércio", emoji:"📦", cor:"#e9c46a"},
+  {id:"sinistro", titulo:"Regulação de Sinistro", descricao:"Análise de perdas", emoji:"🚚", cor:"#2a9d8f"},
+  {id:"risco", titulo:"Análise de Risco", descricao:"Prevenção", emoji:"⚠️", cor:"#f4a261"},
+  {id:"seguro", titulo:"Seguro de Transporte", descricao:"Cobertura", emoji:"📑", cor:"#8ecae6"},
+  {id:"documentos", titulo:"Documentação", descricao:"Controle", emoji:"🧾", cor:"#90be6d"},
+  {id:"prevencao", titulo:"Prevenção de Perdas", descricao:"Evitar prejuízos", emoji:"🚨", cor:"#e76f51"}
+];
+
+let temasAdmin = [];
+const id = localStorage.getItem("editando");
+let tema = null;
+let ePadrao = false;
+let tipoAtual = "";
+
+/* VALIDAR URL */
+function validarURL(url) {
+  if (!url || url.trim() === "") return false;
+  
+  try {
+    const urlObj = new URL(url);
+    
+    // Não aceitar URLs locais
+    if (urlObj.protocol === 'file:') {
+      return false;
+    }
+    
+    // Aceitar http, https, e outros protocolos válidos
+    return ['http:', 'https:'].includes(urlObj.protocol);
+  } catch {
+    return false;
+  }
+}
+
+/* CARREGAR DO FIREBASE */
+db.ref("temas").on("value", snapshot => {
+  temasAdmin = snapshot.val() || [];
+
+  // Verifica se é tema padrão
+  const temaPadrao = padrao.find(p => p.id == id);
+  if(temaPadrao){
+    tema = temaPadrao;
+    ePadrao = true;
+  } else {
+    tema = temasAdmin.find(t => t.id == id);
+    ePadrao = false;
+  }
+
+  if(tema){
+    document.getElementById("titulo").innerText = "Editar Conteúdo: " + tema.titulo;
+  }
+});
+
+function abrirForm(tipo) {
+  tipoAtual = tipo;
+  document.getElementById("form").style.display = "block";
+
+  document.getElementById("videoSection").style.display = "none";
+  document.getElementById("apresentacaoSection").style.display = "none";
+  document.getElementById("ebookSection").style.display = "none";
+
+  if (tipo === "video") {
+    document.getElementById("videoSection").style.display = "block";
+    document.getElementById("linkVideo").value = tema.video || "";
+  }
+
+  if (tipo === "apresentacao") {
+    document.getElementById("apresentacaoSection").style.display = "block";
+    document.getElementById("linkApresentacao").value = tema.imagem || "";
+  }
+
+  if (tipo === "ebook") {
+    document.getElementById("ebookSection").style.display = "block";
+    document.getElementById("linkEbook").value = tema.pdf || "";
+  }
+}
+
+function salvar() {
+  if (!tema) {
+    alert("Tema não encontrado.");
+    return;
+  }
+
+  if (ePadrao) {
+    alert("Temas padrão não podem ter conteúdo editado diretamente. Crie um novo tema se necessário.");
+    return;
+  }
+
+  let link = "";
+  
+  if (tipoAtual === "video") {
+    link = document.getElementById("linkVideo").value;
+    if (!validarURL(link)) {
+      alert("Por favor, insira uma URL válida para a videoaula (ex: https://www.youtube.com/...)");
+      return;
+    }
+    tema.video = link;
+  }
+
+  if (tipoAtual === "apresentacao") {
+    link = document.getElementById("linkApresentacao").value;
+    if (!validarURL(link)) {
+      alert("Por favor, insira uma URL válida para a apresentação.");
+      return;
+    }
+    tema.imagem = link;
+  }
+
+  if (tipoAtual === "ebook") {
+    link = document.getElementById("linkEbook").value;
+    if (!validarURL(link)) {
+      alert("Por favor, insira uma URL válida para o e-book.");
+      return;
+    }
+    tema.pdf = link;
+  }
+
+  // Mostrar estado de carregamento
+  const btn = document.querySelector("button[onclick='salvar()']");
+  const textoOriginal = btn.innerText;
+  btn.innerText = "Salvando...";
+  btn.disabled = true;
+
+  // Salvar no Firebase
+  db.ref("temas").set(temasAdmin)
+    .then(() => {
+      console.log("Conteúdo salvo com sucesso");
+      alert("Conteúdo salvo com sucesso!");
+      document.getElementById("form").style.display = "none";
+      btn.innerText = textoOriginal;
+      btn.disabled = false;
+    })
+    .catch(error => {
+      console.error("Erro ao salvar conteúdo:", error);
+      alert("Não foi possível salvar o conteúdo. Erro: " + error.message);
+      btn.innerText = textoOriginal;
+      btn.disabled = false;
+    });
+}
+
+</script>
+
+</body>
+</html>
